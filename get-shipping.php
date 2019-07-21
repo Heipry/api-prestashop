@@ -24,18 +24,22 @@ $response = $client->request(
 );
 $string=(string)$response->getBody();
 $xml = simplexml_load_string($string);
-
-
-if ($xml->order->id_carrier=='299' || $xml->order->id_carrier=='446' || $xml->order->id_carrier=='4004') {
-	echo "Enviado con MRW el: ".$xml->order->delivery_date.'<br> Realiza seguimiento: ' ;
-	echo '<a href="https://www.mrw.es/seguimiento_envios/MRW_resultados_consultas.asp?modo=nacional&envio='.$xml->order->shipping_number.'">'.$xml->order->shipping_number.'</a>';
-}elseif($xml->order->id_carrier==430){
-	echo "Enviado con GLS el: ".$xml->order->delivery_date.'<br> ' ;
-	echo "Lo sentimos, GLS aún no nos ha pasado un nº de seguimiento";	
-
+if ($xml->order->current_state == 6) {
+	echo "Este pedido ha sido cancelado";
+}elseif ($xml->order->delivery_date == '0000-00-00 00:00:00') {
+	echo "El pedido aún no ha sido recogido de nuestras instalaciones";
 }else{
-	echo "Enviado el: ".$xml->order->delivery_date.'<br> Si ya han pasado 4 o 5 días quizás puedas ' ;
-	echo '<a href="https://txt.es/delegacionestxt/#titledelegaciones"> llamar a tu agencia TXT más cercana</a>';
+	if ($xml->order->id_carrier=='299' || $xml->order->id_carrier=='446' || $xml->order->id_carrier=='4004') {
+		echo "Enviado con MRW el: ".$xml->order->delivery_date.'<br> Realiza seguimiento: ' ;
+		echo '<a href="https://www.mrw.es/seguimiento_envios/MRW_resultados_consultas.asp?modo=nacional&envio='.$xml->order->shipping_number.'">'.$xml->order->shipping_number.'</a>';
+	}elseif($xml->order->id_carrier==430){
+		echo "Enviado con GLS el: ".$xml->order->delivery_date.'<br> ' ;
+		echo "Lo sentimos, GLS aún no nos ha pasado un nº de seguimiento";	
+
+	}else{
+		echo "Enviado el: ".$xml->order->delivery_date.'<br> Si ya han pasado 4 o 5 días quizás puedas ' ;
+		echo '<a href="https://txt.es/delegacionestxt/#titledelegaciones"> llamar a tu agencia TXT más cercana</a>';
+	}
 }
-//echo $xml->order->id_carrier;
+echo '<hr><br><a href="shippingByReference.html">Buscar otro pedido</a>';
 print_r($string);
